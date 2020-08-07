@@ -2,16 +2,19 @@
 const AWS = require('aws-sdk')
 const helpers = require('./helpers')
 
-AWS.config.update({ region: '/* TODO: Add your region */' })
+AWS.config.update({region: 'us-east-2'})
 
 // Declare local variables
 // TODO: Create a new ELBv2 object
+const elbv2 = new AWS.ELBv2();
+
 const sgName = 'hamsterELBSG'
 const tgName = 'hamsterTG'
 const elbName = 'hamsterELB'
-const vpcId = '/* TODO: Add your VPC Id */'
+const vpcId = 'vpc-9251f7f9'
 const subnets = [
   /* TODO: Add two subnets */
+  'subnet-1462ac7f', 'subnet-3a585f40'
 ]
 
 helpers.createSecurityGroup(sgName, 80)
@@ -30,6 +33,16 @@ helpers.createSecurityGroup(sgName, 80)
 .then((data) => console.log(data))
 
 function createLoadBalancer (lbName, sgId) {
+  const params = {
+    Name: lbName,
+    Subnets: subnets,
+    SecurityGroups: [sgId]
+  }
+
+  return new Promise(((resolve, reject) => {
+    elbv2.createLoadBalancer(params, ((err, data) =>
+        err ? reject(err) : resolve(data)))
+  }))
   // TODO: Create a load balancer
 }
 
